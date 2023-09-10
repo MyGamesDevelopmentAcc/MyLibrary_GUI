@@ -536,9 +536,25 @@ function WowListFrame:RemoveAll()
     self:UpdateView();
 end
 
+function WowListFrame:GotoRow(number)
+    local number = number-1;
+    self.view["slider"]:SetValue(number > #self.dataView and #self.dataView or number);
+    self.view["slider"].lastValue = self.view["slider"]:GetValue();
+    print(self.view["slider"].lastValue)
+    self:UpdateView();
+end
+
+function WowListFrame:GetSliderValue()
+    return self.view["slider"].lastValue or 0;
+end
+
 function WowListFrame:Sort(column, compareFunction)
     MergeSort:Sort(self.data, function(a, b) return compareFunction(a[column], b[column]) end)
     self:UpdateDataView();
+end
+
+function WowListFrame:GetDataView()
+    return self.dataView;
 end
 
 function WowListFrame:UpdateDataView()
@@ -705,11 +721,12 @@ local mixins = {
     "Sort",
     "CreateModel",
     "SliderValueChanged",
-    "ChangeButtonState",
+    "GetSliderValue",
+   -- "ChangeButtonState",
     "UpdateDataView",
     "UpdateView",
     "AddData",
-    "GetKeySet",
+   -- "GetKeySet",
     "SetData",
     "GetSelected",
     "GetLastSelected",
@@ -718,6 +735,8 @@ local mixins = {
     "GetData",
     "RemoveAll",
     "RemoveData",
+    "GotoRow",
+    "GetDataView"
 }
 
 ---
