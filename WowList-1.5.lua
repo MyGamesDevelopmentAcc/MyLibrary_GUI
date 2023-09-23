@@ -540,7 +540,7 @@ function WowListFrame:GotoRow(number)
     local number = number-1;
     self.view["slider"]:SetValue(number > #self.dataView and #self.dataView or number);
     self.view["slider"].lastValue = self.view["slider"]:GetValue();
-    print(self.view["slider"].lastValue)
+   -- print(self.view["slider"].lastValue)
     self:UpdateView();
 end
 

@@ -223,6 +223,67 @@ function GL:CreateSimpleFrame(frameName, width, height)
     return f;
 end
 
+local function getTab(frame, index)
+	return frame.Tabs[index];
+end
+
+function GL:RegisterTab(frame, name, top)
+    frame.Tabs = frame.Tabs or {};
+   
+    local newTab = CreateFrame("Button", name.."Tab"..(#frame.Tabs+1), frame, top and "PanelTopTabButtonTemplate" or "PanelTabButtonTemplate"); --PanelTopTabButtonTemplate
+    
+    local id = #frame.Tabs;
+    --table.insert(self.Tabs, newTab);
+    newTab:SetText(name);
+    if(#frame.Tabs==1) then 
+        if (top) then
+            newTab:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 11,-2);
+        else
+            newTab:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 11,2);
+        end
+    end    
+    --
+    newTab:SetID(id);
+    newTab:SetScript("OnClick", function()
+        PanelTemplates_SetTab(frame,id)
+        if ( frame.selectedTab ) then
+            local tab;
+            for i=1, frame.numTabs, 1 do
+                tab = getTab(frame, i);
+                if ( tab.isDisabled ) then
+                    tab.frame:Hide();
+                elseif ( i == frame.selectedTab ) then
+                    tab.frame:Show();
+                else
+                    tab.frame:Hide();
+                end
+            end
+        end
+    end)
+    
+    local containerFrame = CreateFrame("Frame", name.."Frame", frame)
+    containerFrame:SetPoint("TOPLEFT")
+    containerFrame:SetPoint("BOTTOMRIGHT")
+    newTab.frame = containerFrame;
+    print("tabs", #frame.Tabs)
+    PanelTemplates_SetNumTabs(frame, #frame.Tabs)
+    PanelTemplates_SetTab(frame, 1)
+    if ( frame.selectedTab ) then
+        local tab;
+        for i=1, frame.numTabs, 1 do
+            tab = getTab(frame, i);
+            if ( tab.isDisabled ) then
+                tab.frame:Hide();
+            elseif ( i == frame.selectedTab ) then
+                tab.frame:Show();
+            else
+                tab.frame:Hide();
+            end
+        end
+    end
+    return containerFrame;
+end
+
 function GL:CreateButtonFrame(frameName, width, height)
     width = width or 665;
     height = height or 395;
