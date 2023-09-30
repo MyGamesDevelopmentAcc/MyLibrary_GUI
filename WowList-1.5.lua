@@ -102,7 +102,6 @@ function MergeSort:Merge(A, p, q, r, compare)
     local j = 1
     local resp;
     for k = p, r do
-
         if right[j] == math.huge then
             resp = false;
         elseif left[i] == math.huge then
@@ -116,7 +115,6 @@ function MergeSort:Merge(A, p, q, r, compare)
         else
             A[k] = left[i]
             i = i + 1
-
         end
     end
 end
@@ -147,8 +145,8 @@ function WL:CreateNew(name, config, parentFrame)
     wowListFrame.name = name;
 
 
-    wowListFrame.rowSize = config.height / config.rows;
-    wowListFrame.height = wowListFrame.rowSize * (config.rows + 1);
+    wowListFrame.rowSize = config.height / (config.rows + 1);
+    wowListFrame.height = config.height;
     WL.CreateModel(wowListFrame, config);
 
 
@@ -165,7 +163,7 @@ function WL.CreateModel(frame, config)
     frame.filters = {};
     frame.options = { singleSelect = false };
     frame.defultRowsColor = { 1, 1, 1, 1 };
-    --frame.callbacks = LibStub("CallbackHandler-1.0"):New(frame)
+    Mixin(frame, EventRegistry);
     frame:EnableMouse(true);
     frame:EnableMouseWheel(true)
     frame:SetScript("OnMouseWheel", function(self, delta)
@@ -189,7 +187,6 @@ function WL.CreateModel(frame, config)
     WL.CreateCells(frame, config);
     frame.data = {};
     frame.dataView = {};
-
 end
 
 local function getObjName(objName, dim1, dim2)
@@ -197,10 +194,8 @@ local function getObjName(objName, dim1, dim2)
 end
 
 function WL.CreateColumns(mainFrame, config)
-
     local dist = 0;
     for x = 1, mainFrame.columns do
-
         local columnHeaderButton = CreateFrame("Frame", nil, mainFrame, BackdropTemplateMixin and "BackdropTemplate");
         --columnHeaderButton:Raise()
         GL.CreateFontString(columnHeaderButton, nil, "ARTWORK", config.columns[x].name, "LEFT",
@@ -233,7 +228,6 @@ function WL.CreateColumns(mainFrame, config)
                 end)
             columnHeaderButton:SetScript("OnMouseDown",
                 function(self)
-
                     if not self.sortOrder or mainFrame.lastSorted ~= x then
                         mainFrame:Sort(x, sortFunction)
                         self.sortOrder = true;
@@ -269,8 +263,6 @@ function WL.CreateSlider(frame, height)
 end
 
 function WL.CreateCells(mainFrame, config)
-
-
     local view = mainFrame.view;
     local dist = 0;
 
@@ -325,7 +317,7 @@ function WL.CreateCells(mainFrame, config)
                 cellFrame:SetScript("OnEnter",
                     function(self)
                         cellOnEnterFunction(mainFrame.dataView[rowButton.dataNr][x], mainFrame.dataView[rowButton.dataNr
-                            ], x);
+                        ], x);
                     end)
             end
 
@@ -333,7 +325,7 @@ function WL.CreateCells(mainFrame, config)
                 cellFrame:SetScript("OnLeave",
                     function(self)
                         cellOnLeaveFunction(mainFrame.dataView[rowButton.dataNr][x], mainFrame.dataView[rowButton.dataNr
-                            ], x);
+                        ], x);
                     end)
             end
             cellFrame:SetMouseClickEnabled(false);
@@ -369,7 +361,10 @@ function WL.CreateCells(mainFrame, config)
         rowButton:SetScript("OnMouseDown",
             function(self, button)
                 local parent = self:GetParent()
-                if parent.buttonOnMouseDownFunction then parent.buttonOnMouseDownFunction(parent.dataView[self.dataNr]) return end
+                if parent.buttonOnMouseDownFunction then
+                    parent.buttonOnMouseDownFunction(parent.dataView[self.dataNr])
+                    return
+                end
                 local shiftClick = not IsControlKeyDown() and IsShiftKeyDown();
                 local ctrlClick = IsControlKeyDown() and not IsShiftKeyDown();
                 local mainFrame = self:GetParent()
@@ -377,7 +372,6 @@ function WL.CreateCells(mainFrame, config)
                 local isSelected = self:GetParent().dataView[self.dataNr].isSelected;
                 --add local parent!
                 if button == "LeftButton" then
-
                     if ctrlClick and not singleSelection then
                         if not isSelected then
                             self:SetBackdrop(WL.selectedBackdrop);
@@ -456,15 +450,16 @@ function WL.CreateCells(mainFrame, config)
                         mainFrame.lastSelected = mainFrame.dataView[self.dataNr];
                         mainFrame.lastSelectedId = self.dataNr;
                     end
-
                 end
 
-                -- if button == "LeftButton" then
-                --     mainFrame.callbacks:Fire("SelectionChanged");
-                --     mainFrame.callbacks:Fire("LeftMouseClick", self.dataNr);
-                -- elseif button == "MiddleButton" then mainFrame.callbacks:Fire("MiddleMouseClick", self.dataNr)
-                -- elseif button == "RightButton" then mainFrame.callbacks:Fire("RightMouseClick", self.dataNr)
-                -- end
+                if button == "LeftButton" then
+                    mainFrame:TriggerEvent("SelectionChanged");
+                    mainFrame:TriggerEvent("LeftMouseClick", self.dataNr);
+                elseif button == "MiddleButton" then
+                    mainFrame:TriggerEvent("MiddleMouseClick", self.dataNr)
+                elseif button == "RightButton" then
+                    mainFrame:TriggerEvent("RightMouseClick", self.dataNr)
+                end
             end)
     end
 end
@@ -475,7 +470,6 @@ function WowListFrame:SliderValueChanged()
         self:UpdateView();
         --TODO:Fire slider value changed
     end
-
 end
 
 function WowListFrame:AddData(data, key)
@@ -537,11 +531,23 @@ function WowListFrame:RemoveAll()
 end
 
 function WowListFrame:GotoRow(number)
-    local number = number-1;
+    local number = number - 1;
     self.view["slider"]:SetValue(number > #self.dataView and #self.dataView or number);
     self.view["slider"].lastValue = self.view["slider"]:GetValue();
-   -- print(self.view["slider"].lastValue)
+    -- print(self.view["slider"].lastValue)
     self:UpdateView();
+end
+
+function WowListFrame:SelectRow(number)
+    self.dataView[number].isSelected = true;
+    self.lastSelected = self.dataView[number];
+    self.lastSelectedId = number;
+    for h = 1, self.rows do
+        local row = self.view[getObjName("rowButton", h)];
+        if (self.dataView[row.dataNr]) then
+            row:SetBackdrop(self.dataView[row.dataNr].isSelected and WL.selectedBackdrop or WL.unselectedBackdrop)
+        end
+    end
 end
 
 function WowListFrame:GetSliderValue()
@@ -582,7 +588,6 @@ function WowListFrame:UpdateView()
         slider:SetMinMaxValues(0, 0)
         slider:Disable();
         slider:Hide();
-
     end
 
 
@@ -593,22 +598,21 @@ function WowListFrame:UpdateView()
         local rowButton = view[getObjName("rowButton", y)]
         lineplusoffset = lineplusoffset + 1;
         if lineplusoffset <= #dataView then
-
             for x = 1, self.columns do
                 local cellData = dataView[lineplusoffset][x]
                 local cellFontString = view[getObjName("cellFontString", x, y)];
                 local cellTexture = view[getObjName("cellTexture", x, y)];
                 local cellFrame = view[getObjName("cellFrame", x, y)];
                 if (self.config.columns[x].textureDisplayFunction) then
-                    local texture, color, width, height, xoffset = self.config.columns[x].textureDisplayFunction(cellData
+                    local texture, color, width, height, xoffset = self.config.columns[x].textureDisplayFunction(
+                        cellData
                         , dataView[lineplusoffset], x, y);
                     if (not texture and not color or width and width == 0) then
                         cellTexture:Hide();
                     else
-                        
-                        if texture then 
-                            cellTexture:SetTexture(texture); 
-                            if color then 
+                        if texture then
+                            cellTexture:SetTexture(texture);
+                            if color then
                                 cellTexture:SetVertexColor(unpack(color))
                             end
                         else
@@ -666,7 +670,6 @@ end
 
 function WowListFrame:CheckFilters(data)
     for name, v in pairs(self.filters) do
-
         if not v(data) then
             return false
         end
@@ -675,7 +678,6 @@ function WowListFrame:CheckFilters(data)
 end
 
 function WowListFrame:AddFilter(name, filterFunc)
-
     self.filters[name] = filterFunc;
     self:UpdateDataView();
 end
@@ -722,21 +724,22 @@ local mixins = {
     "CreateModel",
     "SliderValueChanged",
     "GetSliderValue",
-   -- "ChangeButtonState",
+    -- "ChangeButtonState",
     "UpdateDataView",
     "UpdateView",
     "AddData",
-   -- "GetKeySet",
+    -- "GetKeySet",
     "SetData",
     "GetSelected",
     "GetLastSelected",
-    "GetDataByKey",
+    --"GetDataByKey",
     "SetMultiSelection",
     "GetData",
     "RemoveAll",
     "RemoveData",
     "GotoRow",
-    "GetDataView"
+    "GetDataView",
+    "SelectRow"
 }
 
 ---

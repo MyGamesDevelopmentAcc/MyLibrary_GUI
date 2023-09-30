@@ -115,27 +115,26 @@ function GL:SetFrameLook(f, backgroundPicture)
         f:SetBackdrop({
             bgFile = GL.blank,
             edgeFile = GL.blank,
-            tile = false, tileSize = 0, edgeSize = 1,
+            tile = false,
+            tileSize = 0,
+            edgeSize = 1,
             insets = { left = -1, right = -1, top = -1, bottom = -1 }
         })
         f:SetBackdropColor(unpack(l.backdropcolor))
         f:SetBackdropBorderColor(unpack(l.bordercolor))
     else
-
         local bgpic = backgroundPicture;
 
         f:SetBackdrop({
-            bgFile = bgpic, -- DkpBidder["media"].blank,  -- path to the background texture
+            bgFile = bgpic,                                      -- DkpBidder["media"].blank,  -- path to the background texture
             edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", -- path to the border texture
 
-            tile = false, -- true to repeat the background texture to fill the frame, false to scale it
-            tileSize = 32, -- size (width or height) of the square repeating background tiles (in pixels)
-            edgeSize = 12, -- thickness of edge segments and square size of edge corners (in pixels)
+            tile = false,                                        -- true to repeat the background texture to fill the frame, false to scale it
+            tileSize = 32,                                       -- size (width or height) of the square repeating background tiles (in pixels)
+            edgeSize = 12,                                       -- thickness of edge segments and square size of edge corners (in pixels)
             insets = { left = 3, right = 3, top = 3, bottom = 3 }
         })
         if backgroundPicture == nil then f:SetBackdropColor(unpack(l.backdropcolor)) end
-
-
     end
 end
 
@@ -160,7 +159,6 @@ function GL.CreateTexture(frame, name, level, width, height, point, relativeTo, 
 end
 
 function GL:CreateFontString(name, level, text, point, relativeTo, point2, x, y)
-
     local fs = self:CreateFontString(name, level, "GameFontNormal");
     if point then fs:SetPoint(point, relativeTo, point2, x, y); end
     fs:SetText(text);
@@ -182,7 +180,7 @@ function GL:CreateSimpleFrame(frameName, width, height)
     width = width or 665;
     height = height or 395;
     local f = CreateFrame("Frame", frameName, UIParent, "SimplePanelTemplate");
-    _G[frameName]=f;
+    _G[frameName] = f;
     table.insert(_G.UISpecialFrames, frameName);
 
 
@@ -224,58 +222,60 @@ function GL:CreateSimpleFrame(frameName, width, height)
 end
 
 local function getTab(frame, index)
-	return frame.Tabs[index];
+    return frame.Tabs[index];
 end
 
-function GL:RegisterTab(frame, name, top)
+function GL:RegisterTab(frame, name, top, inset)
     frame.Tabs = frame.Tabs or {};
-   
-    local newTab = CreateFrame("Button", name.."Tab"..(#frame.Tabs+1), frame, top and "PanelTopTabButtonTemplate" or "PanelTabButtonTemplate"); --PanelTopTabButtonTemplate
-    
+
+    local newTab = CreateFrame("Button", name .. "Tab" .. (#frame.Tabs + 1), frame,
+        top and "PanelTopTabButtonTemplate" or "PanelTabButtonTemplate");                                                                       --PanelTopTabButtonTemplate
+
     local id = #frame.Tabs;
     --table.insert(self.Tabs, newTab);
     newTab:SetText(name);
-    if(#frame.Tabs==1) then 
+    if (#frame.Tabs == 1) then
         if (top) then
-            newTab:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 11,-2);
+            newTab:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 11, -2);
         else
-            newTab:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 11,2);
+            newTab:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 11, 2);
         end
-    end    
+    end
     --
     newTab:SetID(id);
     newTab:SetScript("OnClick", function()
-        PanelTemplates_SetTab(frame,id)
-        if ( frame.selectedTab ) then
+        PanelTemplates_SetTab(frame, id)
+        if (frame.selectedTab) then
             local tab;
-            for i=1, frame.numTabs, 1 do
+            for i = 1, frame.numTabs, 1 do
                 tab = getTab(frame, i);
-                if ( tab.isDisabled ) then
+                if (tab.isDisabled) then
                     tab.frame:Hide();
-                elseif ( i == frame.selectedTab ) then
+                elseif (i == frame.selectedTab) then
                     tab.frame:Show();
+                    frame.selectedFrame = tab.frame;
                 else
                     tab.frame:Hide();
                 end
             end
         end
     end)
-    
-    local containerFrame = CreateFrame("Frame", name.."Frame", frame)
+
+    local containerFrame = CreateFrame("Frame", name .. "Frame", frame, inset and "InsetFrameTemplate")
     containerFrame:SetPoint("TOPLEFT")
     containerFrame:SetPoint("BOTTOMRIGHT")
     newTab.frame = containerFrame;
-    print("tabs", #frame.Tabs)
     PanelTemplates_SetNumTabs(frame, #frame.Tabs)
     PanelTemplates_SetTab(frame, 1)
-    if ( frame.selectedTab ) then
+    if (frame.selectedTab) then
         local tab;
-        for i=1, frame.numTabs, 1 do
+        for i = 1, frame.numTabs, 1 do
             tab = getTab(frame, i);
-            if ( tab.isDisabled ) then
+            if (tab.isDisabled) then
                 tab.frame:Hide();
-            elseif ( i == frame.selectedTab ) then
+            elseif (i == frame.selectedTab) then
                 tab.frame:Show();
+                frame.selectedFrame = tab.frame;
             else
                 tab.frame:Hide();
             end
@@ -288,7 +288,7 @@ function GL:CreateButtonFrame(frameName, width, height)
     width = width or 665;
     height = height or 395;
     local f = CreateFrame("Frame", frameName, UIParent, "ButtonFrameTemplate");
-    _G[frameName]=f;
+    _G[frameName] = f;
     table.insert(_G.UISpecialFrames, frameName);
     ButtonFrameTemplate_HidePortrait(f);
 
