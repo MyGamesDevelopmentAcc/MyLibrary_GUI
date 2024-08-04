@@ -163,7 +163,11 @@ function WL.CreateModel(frame, config)
     frame.filters = {};
     frame.options = { singleSelect = false };
     frame.defultRowsColor = { 1, 1, 1, 1 };
-    Mixin(frame, EventRegistry);
+    Mixin(frame, CallbackRegistryMixin);
+    
+    frame:OnLoad()
+    frame:SetUndefinedEventsAllowed(true)
+
     frame:EnableMouse(true);
     frame:EnableMouseWheel(true)
     frame:SetScript("OnMouseWheel", function(self, delta)
