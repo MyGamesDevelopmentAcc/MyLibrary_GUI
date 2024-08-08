@@ -164,7 +164,7 @@ function WL.CreateModel(frame, config)
     frame.options = { singleSelect = false };
     frame.defultRowsColor = { 1, 1, 1, 1 };
     Mixin(frame, CallbackRegistryMixin);
-    
+
     frame:OnLoad()
     frame:SetUndefinedEventsAllowed(true)
 
@@ -362,12 +362,24 @@ function WL.CreateCells(mainFrame, config)
                     self:SetBackdrop(WL.unselectedBackdrop)
                 end
             end)
+
+
+
+        rowButton:SetScript("OnReceiveDrag", function(self, button)
+            local parent = self:GetParent()
+            if parent.buttonOnReceiveDragFunction then
+                parent.buttonOnReceiveDragFunction(parent.dataView[self.dataNr])
+            end
+        end)
+
         rowButton:SetScript("OnMouseDown",
             function(self, button)
                 local parent = self:GetParent()
                 if parent.buttonOnMouseDownFunction then
-                    parent.buttonOnMouseDownFunction(parent.dataView[self.dataNr])
-                    return
+                    parent.buttonOnMouseDownFunction(parent.dataView[self.dataNr], button)
+                    if (not parent.buttonOnMouseDownFunctionDoNotOverride) then
+                        return
+                    end
                 end
                 local shiftClick = not IsControlKeyDown() and IsShiftKeyDown();
                 local ctrlClick = IsControlKeyDown() and not IsShiftKeyDown();
@@ -482,7 +494,7 @@ function WowListFrame:AddData(data, key)
     data.isSelected = nil;
     table.insert(self.data, data);
     if self:CheckFilters(data) then
-        table.insert(self.dataView, data);
+        table.insert(self.dataView, data); -- TODO: this is wrong. data should be wrapped with separate object. Otherwise this is modifying the data object which is wrong. so wrong. highest priority. If I ever look back in here.
     end
 end
 
@@ -708,9 +720,15 @@ function WowListFrame:SetButtonOnLeaveFunction(func)
     self.buttonOnLeaveFunction = func;
 end
 
-function WowListFrame:SetButtonOnMouseDownFunction(func)
+function WowListFrame:SetButtonOnMouseDownFunction(func, doNotOverride)
     assert(type(func) == "function", libName .. ":SetButtonOnMouseDownFunction requires function as a second parameter")
     self.buttonOnMouseDownFunction = func;
+    self.buttonOnMouseDownFunctionDoNotOverride = doNotOverride
+end
+
+function WowListFrame:SetButtonOnReceiveDragFunction(func)
+    assert(type(func) == "function", libName .. ":SetButtonOnReceiveDragFunction requires function as a second parameter")
+    self.buttonOnReceiveDragFunction = func;
 end
 
 local mixins = {
@@ -724,6 +742,7 @@ local mixins = {
     "SetButtonOnEnterFunction",
     "SetButtonOnLeaveFunction",
     "SetButtonOnMouseDownFunction",
+    "SetButtonOnReceiveDragFunction",
     "Sort",
     "CreateModel",
     "SliderValueChanged",
