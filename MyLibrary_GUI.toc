@@ -1,5 +1,5 @@
-## Interface: 100107
+## Interface: 110002
 ## Title: Lib: |CFFFF2459My|rLibrary GUI
 ## Dependencies: 
-## Version: 10.1.7-1.1
+## Version: 11.0.2-1.2
 gui.xml
