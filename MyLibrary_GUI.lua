@@ -229,7 +229,7 @@ function GL:RegisterTab(frame, name, top, inset)
     frame.Tabs = frame.Tabs or {};
 
     local newTab = CreateFrame("Button", name .. "Tab" .. (#frame.Tabs + 1), frame,
-        top and "PanelTopTabButtonTemplate" or "PanelTabButtonTemplate");                                                                       --PanelTopTabButtonTemplate
+        top and "PanelTopTabButtonTemplate" or "PanelTabButtonTemplate"); --PanelTopTabButtonTemplate
 
     local id = #frame.Tabs;
     --table.insert(self.Tabs, newTab);
@@ -284,10 +284,11 @@ function GL:RegisterTab(frame, name, top, inset)
     return containerFrame;
 end
 
-function GL:CreateButtonFrame(frameName, width, height)
+function GL:CreateButtonFrame(frameName, width, height, doNotAnchor, parentFrame)
     width = width or 665;
     height = height or 395;
-    local f = CreateFrame("Frame", frameName, UIParent, "ButtonFrameTemplate");
+    parentFrame = parentFrame or UIParent
+    local f = CreateFrame("Frame", frameName, parentFrame, "ButtonFrameTemplate");
     _G[frameName] = f;
     table.insert(_G.UISpecialFrames, frameName);
     ButtonFrameTemplate_HidePortrait(f);
@@ -297,7 +298,9 @@ function GL:CreateButtonFrame(frameName, width, height)
     f:SetHeight(height);
     --f:EnableMouse(true); ?? co to robi?
     f:SetMovable(true);
-    f:SetPoint('CENTER', UIParent, 'CENTER', -100, 0)
+    if (not doNotAnchor) then
+        f:SetPoint('CENTER', parentFrame, 'CENTER', -100, 0)
+    end
     f:SetScript("OnMouseDown",
         function(self)
             self:StartMoving();
