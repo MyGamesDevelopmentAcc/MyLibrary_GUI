@@ -61,6 +61,9 @@ WL.titleBackdrop = {
 }
 
 local MergeSort = {}
+--- Stable merge-sort of an array in place.
+---@param A table Array to sort (modified in place)
+---@param compare fun(a:any,b:any):boolean Comparator returning true when a < b
 function MergeSort:Sort(A, compare)
     local p = 1;
     local r = #A;
@@ -72,6 +75,11 @@ function MergeSort:Sort(A, compare)
     end
 end
 
+--- Inner recursive merge-sort routine.
+---@param A table
+---@param p number Start index (1-based)
+---@param r number End index (inclusive)
+---@param compare fun(a:any,b:any):boolean
 function MergeSort:MergeSort(A, p, r, compare)
     if p < r then
         local q = math.floor((p + r) / 2)
@@ -82,6 +90,12 @@ function MergeSort:MergeSort(A, p, r, compare)
 end
 
 -- merge an array split from p-q, q-r
+--- Merge two sorted subarrays A[p..q] and A[q+1..r].
+---@param A table
+---@param p number
+---@param q number
+---@param r number
+---@param compare fun(a:any,b:any):boolean
 function MergeSort:Merge(A, p, q, r, compare)
     local n1 = q - p + 1
     local n2 = r - q
@@ -154,6 +168,9 @@ function WL:CreateNew(name, config, parentFrame)
     return wowListFrame;
 end
 
+--- Build model/state for a WowList frame and wire inputs.
+---@param frame WowListFrame
+---@param config table See WL:CreateNew for schema
 function WL.CreateModel(frame, config)
     frame.view = {};
     frame.rows = config.rows
@@ -193,10 +210,18 @@ function WL.CreateModel(frame, config)
     frame.dataView = {};
 end
 
+--- Build a unique name for a sub-object within the list.
+---@param objName string
+---@param dim1? number|string
+---@param dim2? number|string
+---@return string
 local function getObjName(objName, dim1, dim2)
     return objName .. (dim1 and "_" or "") .. (dim1 or "") .. (dim2 and "_" or "") .. (dim2 or "");
 end
 
+--- Create header columns and optional sorting handlers.
+---@param mainFrame WowListFrame
+---@param config table
 function WL.CreateColumns(mainFrame, config)
     local dist = 0;
     for x = 1, mainFrame.columns do
@@ -247,6 +272,9 @@ function WL.CreateColumns(mainFrame, config)
     end
 end
 
+--- Create and initialize the vertical scroll slider.
+---@param frame WowListFrame
+---@param height number Total height in pixels
 function WL.CreateSlider(frame, height)
     local view = frame.view;
     view["slider"] = CreateFrame("Slider", frame.name .. "_slider", frame, "OptionsSliderTemplate");
@@ -266,6 +294,9 @@ function WL.CreateSlider(frame, height)
     end)
 end
 
+--- Create row frames, per-cell font strings/textures, and cell handlers.
+---@param mainFrame WowListFrame
+---@param config table
 function WL.CreateCells(mainFrame, config)
     local view = mainFrame.view;
     local dist = 0;
@@ -480,6 +511,7 @@ function WL.CreateCells(mainFrame, config)
     end
 end
 
+--- React to slider movement by updating the visible rows.
 function WowListFrame:SliderValueChanged()
     if (self.view["slider"]:GetValue() ~= self.view["slider"].lastValue) then
         self.view["slider"].lastValue = self.view["slider"]:GetValue();
@@ -488,6 +520,9 @@ function WowListFrame:SliderValueChanged()
     end
 end
 
+--- Append a data row and include it in view if it passes filters.
+---@param data table Row array matching columns; `isSelected` must be absent
+---@param key any Unused; reserved for future use
 function WowListFrame:AddData(data, key)
     --assert(#data==#self.columns,"Added data must equal number of columns! Got "..#data..", expected "..#self.columns); -- ignoring as when data can be nil at the end, which woulc casue this to pop. We allow nils?...
     assert(data.isSelected == nil, "Data cannot contain field 'isSelected' as it is a restricted field."); --TODO maybe change to check if field is exists and then if its boolean leave it be.as this might be usefull for copying betwwen lists.
@@ -498,6 +533,9 @@ function WowListFrame:AddData(data, key)
     end
 end
 
+--- Remove a data row (by identity) from the list.
+---@param data table Row to remove
+---@param key any Unused; reserved for future use
 function WowListFrame:RemoveData(data, key)
     assert(#data == #self.columns, "Removed data must equal number of columns!");
     for i, v in ipairs(self.data) do
@@ -510,6 +548,8 @@ function WowListFrame:RemoveData(data, key)
     end
 end
 
+--- Get all currently selected rows.
+---@return table|nil rows Array of selected rows or nil when none
 function WowListFrame:GetSelected()
     local retData = {};
     for i = 1, #self.dataView do
@@ -521,22 +561,32 @@ function WowListFrame:GetSelected()
     if #retData > 0 then return retData else return nil; end
 end
 
+--- Get the last row that was selected (if any).
+---@return table|nil row
 function WowListFrame:GetLastSelected()
     return self.lastSelected;
 end
 
+--- Replace the underlying data array. Call `UpdateDataView` afterward to refresh.
+---@param data table
 function WowListFrame:SetData(data)
     self.data = data;
 end
 
+--- Get a data row by index in the backing array.
+---@param nr number 1-based index
+---@return table|nil
 function WowListFrame:GetData(nr)
     return self.data[nr];
 end
 
+--- Enable or disable multi-selection mode.
+---@param val boolean true enables multi-select; false makes single-select
 function WowListFrame:SetMultiSelection(val)
     self.options = { singleSelect = not val };
 end
 
+--- Clear all data and selections and refresh the view.
 function WowListFrame:RemoveAll()
     --WL.ClearTable(self.data)
     wipe(self.data);
@@ -546,6 +596,8 @@ function WowListFrame:RemoveAll()
     self:UpdateView();
 end
 
+--- Scroll the view so that the given row index is first visible.
+---@param number number 1-based row index in dataView
 function WowListFrame:GotoRow(number)
     local number = number - 1;
     self.view["slider"]:SetValue(number > #self.dataView and #self.dataView or number);
@@ -566,19 +618,44 @@ function WowListFrame:SelectRow(number)
     end
 end
 
+--- Current slider offset (top row index offset).
+---@return number
 function WowListFrame:GetSliderValue()
     return self.view["slider"].lastValue or 0;
 end
 
+--- Sort backing data by a column using provided comparator.
+---@param column number Column index to compare on
+---@param compareFunction fun(a:any,b:any):boolean Comparator for cell values
 function WowListFrame:Sort(column, compareFunction)
     MergeSort:Sort(self.data, function(a, b) return compareFunction(a[column], b[column]) end)
     self:UpdateDataView();
 end
 
+--- Get the current filtered data view (read-only usage recommended).
+---@return table
 function WowListFrame:GetDataView()
     return self.dataView;
 end
 
+--- Get the current filtered data view (read-only usage recommended).
+--- ---@param predicate function which will receive a row and return true for the row matching expected row to be highlighted.
+function WowListFrame:SelectRowByPredicate(predicate)
+    local dataView = self:GetDataView()
+    for idx, row in ipairs(dataView) do
+        if predicate(row) then
+            self:SelectRow(idx)
+            self:GotoRow(idx)
+            if self.TriggerEvent then
+                self:TriggerEvent("SelectionChanged")
+            end
+            return true
+        end
+    end
+    return false
+end
+
+--- Rebuild the `dataView` array based on active filters.
 function WowListFrame:UpdateDataView()
     self.dataView = {};
     for i = 1, #self.data do
@@ -588,6 +665,7 @@ function WowListFrame:UpdateDataView()
     end
 end
 
+--- Render visible rows based on slider position and dataView.
 function WowListFrame:UpdateView()
     local line;
     local lineplusoffset;
@@ -684,6 +762,9 @@ function WowListFrame:UpdateView()
     end
 end
 
+--- Check if a row passes all active filters.
+---@param data table Row to test
+---@return boolean
 function WowListFrame:CheckFilters(data)
     for name, v in pairs(self.filters) do
         if not v(data) then
@@ -693,16 +774,22 @@ function WowListFrame:CheckFilters(data)
     return true;
 end
 
+--- Add or replace a named filter and refresh dataView.
+---@param name string Unique filter name
+---@param filterFunc fun(row:table):boolean
 function WowListFrame:AddFilter(name, filterFunc)
     self.filters[name] = filterFunc;
     self:UpdateDataView();
 end
 
+--- Remove a named filter and refresh dataView.
+---@param name string
 function WowListFrame:RemoveFilter(name)
     self.filters[name] = nil;
     self:UpdateDataView();
 end
 
+--- Remove all filters and refresh dataView.
 function WowListFrame:RemoveAllFilters()
     for i, v in pairs(self.filters) do
         self.filters[i] = nil;
@@ -710,16 +797,22 @@ function WowListFrame:RemoveAllFilters()
     end
 end
 
+--- Set row OnEnter handler; receives the row object.
+---@param func fun(row:table)
 function WowListFrame:SetButtonOnEnterFunction(func)
     assert(type(func) == "function", libName .. ":SetButtonOnEnterFunction requires function as a second parameter")
     self.buttonOnEnterFunction = func;
 end
 
+--- Set row OnLeave handler; receives the row object.
+---@param func fun(row:table)
 function WowListFrame:SetButtonOnLeaveFunction(func)
     assert(type(func) == "function", libName .. ":SetButtonOnLeaveFunction requires function as a second parameter")
     self.buttonOnLeaveFunction = func;
 end
 
+--- Set row OnMouseDown handler; receives the row object.
+---@param func fun(row:table)
 function WowListFrame:SetButtonOnMouseDownFunction(func, doNotOverride)
     assert(type(func) == "function", libName .. ":SetButtonOnMouseDownFunction requires function as a second parameter")
     self.buttonOnMouseDownFunction = func;
@@ -749,6 +842,7 @@ local mixins = {
     "GetSliderValue",
     -- "ChangeButtonState",
     "UpdateDataView",
+    "SelectRowByPredicate",
     "UpdateView",
     "AddData",
     -- "GetKeySet",
