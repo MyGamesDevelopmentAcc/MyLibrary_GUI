@@ -1,4 +1,4 @@
-## Interface: 110002
+## Interface: 110002, 120000
 ## Title: Lib: |CFFFF2459My|rLibrary GUI
 ## Dependencies: 
 ## Version: 11.0.2-1.2

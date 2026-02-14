@@ -583,7 +583,8 @@ end
 --- Enable or disable multi-selection mode.
 ---@param val boolean true enables multi-select; false makes single-select
 function WowListFrame:SetMultiSelection(val)
-    self.options = { singleSelect = not val };
+    self.options = self.options or {}
+    self.options.singleSelect = not val
 end
 
 --- Clear all data and selections and refresh the view.
@@ -607,6 +608,11 @@ function WowListFrame:GotoRow(number)
 end
 
 function WowListFrame:SelectRow(number)
+    if self.options and self.options.singleSelect then
+        for i = 1, #self.dataView do
+            self.dataView[i].isSelected = nil
+        end
+    end
     self.dataView[number].isSelected = true;
     self.lastSelected = self.dataView[number];
     self.lastSelectedId = number;
