@@ -448,7 +448,7 @@ function WL.CreateCells(mainFrame, config)
                             if mainFrame.lastSelectedId > self.dataNr then order = -1; end
 
                             for i = mainFrame.lastSelectedId, self.dataNr, order do
-                                if not mainFrame:CheckFilters(mainFrame.dataView[i]) then
+                                if mainFrame:CheckFilters(mainFrame.dataView[i]) then
                                     mainFrame.dataView[i].isSelected = true;
                                 end
                             end
