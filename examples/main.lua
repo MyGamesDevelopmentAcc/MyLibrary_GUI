@@ -72,7 +72,7 @@ local function ensureLauncher()
         return launcher
     end
 
-    launcher = GL:CreateButtonFrame(addonName .. "_WowListExamplesLauncher", 540, 500)
+    launcher = GL:CreateButtonFrame(addonName .. "_WowListExamplesLauncher", 760, 520)
     launcher:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
     launcher:SetFrameStrata("DIALOG")
     if launcher.TitleText then
@@ -112,6 +112,8 @@ function NS:RefreshLauncher()
             row:SetSize(220, 22)
             row.text = GL.CreateFontString(row, nil, "ARTWORK", "", "TOPLEFT", row, "TOPRIGHT", 10, -2)
             row.text:SetTextColor(0.9, 0.9, 0.9, 1)
+            row.text:SetWidth(500)
+            row.text:SetJustifyH("LEFT")
             frame.rows[idx] = row
         end
 

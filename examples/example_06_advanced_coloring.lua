@@ -43,6 +43,20 @@ NS:RegisterExample("example_06_advanced_coloring", {
             rows = 18,
             height = 430,
             columns = {
+                {
+                    name = "",
+                    width = 0,
+                    textureDisplayFunction = function(_, rowData)
+                        local severity = rowData[3]
+                        if severity == "CRITICAL" then
+                            return nil, { 0.8, 0.1, 0.6, 0.18 }, 960, 18, 0
+                        elseif severity == "ERROR" then
+                            return nil, { 1, 0, 0, 0.10 }, 960, 18, 0
+                        elseif severity == "WARN" then
+                            return nil, { 1, 0.85, 0, 0.08 }, 960, 18, 0
+                        end
+                    end,
+                },
                 { name = "Id", width = 70, sortFunction = function(a, b) return (tonumber(a) or 0) < (tonumber(b) or 0) end },
                 {
                     name = "Severity",
@@ -72,28 +86,14 @@ NS:RegisterExample("example_06_advanced_coloring", {
                         GameTooltip:SetOwner(UIParent, "ANCHOR_CURSOR")
                         GameTooltip:ClearLines()
                         GameTooltip:AddLine("Event Details", 1, 0.82, 0)
-                        GameTooltip:AddLine("Id: " .. tostring(rowData[1]))
-                        GameTooltip:AddLine("Severity: " .. tostring(rowData[2]))
-                        GameTooltip:AddLine("Tag: " .. tostring(rowData[7]))
+                        GameTooltip:AddLine("Id: " .. tostring(rowData[2]))
+                        GameTooltip:AddLine("Severity: " .. tostring(rowData[3]))
+                        GameTooltip:AddLine("Tag: " .. tostring(rowData[8]))
                         GameTooltip:AddLine(cellData or "")
                         GameTooltip:Show()
                     end,
                     cellOnLeaveFunction = function()
                         GameTooltip:Hide()
-                    end,
-                },
-                {
-                    name = "",
-                    width = 0,
-                    textureDisplayFunction = function(_, rowData)
-                        local severity = rowData[2]
-                        if severity == "CRITICAL" then
-                            return nil, { 0.8, 0.1, 0.6, 0.18 }, 960, 18, 0
-                        elseif severity == "ERROR" then
-                            return nil, { 1, 0, 0, 0.10 }, 960, 18, 0
-                        elseif severity == "WARN" then
-                            return nil, { 1, 0.85, 0, 0.08 }, 960, 18, 0
-                        end
                     end,
                 },
             },
@@ -105,18 +105,18 @@ NS:RegisterExample("example_06_advanced_coloring", {
             local search = string.lower(searchBox:GetText() or "")
             local criticalOnly = onlyCritical:GetChecked()
             list:AddFilter("advancedFilter", function(row)
-                local severityMatch = (not criticalOnly) or row[2] == "CRITICAL"
+                local severityMatch = (not criticalOnly) or row[3] == "CRITICAL"
                 if not severityMatch then
                     return false
                 end
                 if search == "" then
                     return true
                 end
-                return string.find(string.lower(tostring(row[2])), search, 1, true)
-                    or string.find(string.lower(tostring(row[3])), search, 1, true)
+                return string.find(string.lower(tostring(row[3])), search, 1, true)
                     or string.find(string.lower(tostring(row[4])), search, 1, true)
-                    or string.find(string.lower(tostring(row[6])), search, 1, true)
+                    or string.find(string.lower(tostring(row[5])), search, 1, true)
                     or string.find(string.lower(tostring(row[7])), search, 1, true)
+                    or string.find(string.lower(tostring(row[8])), search, 1, true)
             end)
             list:UpdateView()
         end
@@ -126,7 +126,8 @@ NS:RegisterExample("example_06_advanced_coloring", {
 
         local rows = Data.GetAdvancedRows()
         for i = 1, #rows do
-            list:AddData(rows[i])
+            local r = rows[i]
+            list:AddData({ false, r[1], r[2], r[3], r[4], r[5], r[6], r[7] })
         end
         list:UpdateView()
 

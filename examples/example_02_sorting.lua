@@ -7,7 +7,7 @@ local Data = NS.SharedData
 
 NS:RegisterExample("example_02_sorting", {
     title = "02 Sorting",
-    description = "Header-driven sorting with text and numeric comparators.",
+    description = "Header sorting + external Sort(...) calls and reset.",
     build = function(self)
         local frame = self:CreateExampleFrame("Sorting", "WowList Example 02 - Sorting", 860, 520)
         local container = CreateFrame("Frame", nil, frame)
@@ -15,7 +15,8 @@ NS:RegisterExample("example_02_sorting", {
         container:SetPoint("BOTTOMRIGHT", frame.Inset, "BOTTOMRIGHT", -10, 10)
 
         local info = GL.CreateFontString(container, nil, "ARTWORK",
-            "Click column headers to toggle ascending/descending order.", "TOPLEFT", container, "TOPLEFT", 4, -4)
+            "Use header clicks OR external buttons below (calls list:Sort directly).", "TOPLEFT", container, "TOPLEFT", 4,
+            -4)
         info:SetTextColor(0.9, 0.9, 0.9, 1)
 
         local list = WowList:CreateNew(addonName .. "_Example02List", {
@@ -47,8 +48,40 @@ NS:RegisterExample("example_02_sorting", {
         reloadButton:SetText("Reload Data")
         reloadButton:SetScript("OnClick", loadRows)
 
+        local sortScoreAsc = CreateFrame("Button", nil, container, "UIPanelButtonTemplate")
+        sortScoreAsc:SetSize(130, 22)
+        sortScoreAsc:SetPoint("LEFT", reloadButton, "RIGHT", 8, 0)
+        sortScoreAsc:SetText("Sort Score Asc")
+        sortScoreAsc:SetScript("OnClick", function()
+            list:Sort(4, function(a, b)
+                return (tonumber(a) or 0) < (tonumber(b) or 0)
+            end)
+            list:UpdateView()
+        end)
+
+        local sortScoreDesc = CreateFrame("Button", nil, container, "UIPanelButtonTemplate")
+        sortScoreDesc:SetSize(130, 22)
+        sortScoreDesc:SetPoint("LEFT", sortScoreAsc, "RIGHT", 8, 0)
+        sortScoreDesc:SetText("Sort Score Desc")
+        sortScoreDesc:SetScript("OnClick", function()
+            list:Sort(4, function(a, b)
+                return (tonumber(a) or 0) > (tonumber(b) or 0)
+            end)
+            list:UpdateView()
+        end)
+
+        local sortNameAsc = CreateFrame("Button", nil, container, "UIPanelButtonTemplate")
+        sortNameAsc:SetSize(130, 22)
+        sortNameAsc:SetPoint("LEFT", sortScoreDesc, "RIGHT", 8, 0)
+        sortNameAsc:SetText("Sort Name Asc")
+        sortNameAsc:SetScript("OnClick", function()
+            list:Sort(1, function(a, b)
+                return tostring(a) < tostring(b)
+            end)
+            list:UpdateView()
+        end)
+
         loadRows()
         return frame
     end,
 })
-

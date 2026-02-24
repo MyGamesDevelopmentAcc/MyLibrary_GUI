@@ -5,44 +5,85 @@ WoW addon library package containing:
 - `MyLibrary_GUI` (general GUI helpers)
 - `WowList-1.5` (scrollable, sortable, filterable multi-column list widget)
 
-## Files
+## Documentation
 
-- `MyLibrary_GUI.lua`: Core helper library.
-- `WowList-1.5.lua`: List widget library.
-- `WowList-1.5.md`: Full `WowList-1.5` documentation with API and sample usage.
-- `gui.xml`: Library load order.
-
-## Load Order
-
-The libraries are loaded through `gui.xml`:
-
-1. `libs/LibStub/LibStub.lua`
-2. `MyLibrary_GUI.lua`
-3. `WowList-1.5.lua`
-
-Make sure your addon loads `gui.xml` (or equivalent order in `.toc`) before calling `LibStub("MyLibrary_GUI")` or `LibStub("WowList-1.5")`.
-
-## Quick Start (`WowList-1.5`)
-
-```lua
-local WowList = LibStub("WowList-1.5")
-
-local list = WowList:CreateNew("ExampleList", {
-    height = 200,
-    rows = 8,
-    columns = {
-        { name = "Name", width = 160, sortFunction = function(a, b) return tostring(a) < tostring(b) end },
-        { name = "Role", width = 120 },
-        { name = "Score", width = 80, sortFunction = function(a, b) return (tonumber(a) or 0) < (tonumber(b) or 0) end },
-    },
-}, UIParent)
-
-list:SetPoint("CENTER")
-list:AddData({"Thrall", "DPS", 95})
-list:AddData({"Jaina", "DPS", 99})
-list:UpdateView()
-```
-
-For complete API details, events, and advanced examples, see:
+For loading instructions, usage patterns, and full `WowList-1.5` API details, see:
 
 - [WowList-1.5.md](WowList-1.5.md)
+
+## Examples
+
+Examples are implemented in the `examples/` directory and are available when this project is loaded directly as an addon.
+Open the examples menu from the Addon Compartment menu (top-right addon button area), then click `MyLibrary_GUI`.
+
+![Menu image](https://raw.githubusercontent.com/MyGamesDevelopmentAcc/MyLibrary_GUI/main/.previews/menu.png)
+
+### 01 Basic
+
+What it shows:
+- Small, minimal list setup.
+- Basic row insertion and view refresh.
+- Single-selection behavior with no sorting hooks.
+
+Screenshot placeholder:
+![Example 1 image](https://raw.githubusercontent.com/MyGamesDevelopmentAcc/MyLibrary_GUI/main/.previews/1.png)
+
+### 02 Sorting
+
+What it shows:
+- Header-click sorting with per-column comparators.
+- External/manual sorting through direct `Sort(...)` actions.
+- Data reload flow with sorting preserved by user action.
+
+Screenshot placeholder:
+![Example 2 image](https://raw.githubusercontent.com/MyGamesDevelopmentAcc/MyLibrary_GUI/main/.previews/2.png)
+
+### 03 Filtering (TradeChat Style)
+
+What it shows:
+- Text search filtering across multiple fields.
+- Named filter pattern (`AddFilter`) driven by UI input.
+- Visible-count behavior while filters are active.
+
+Screenshot placeholder:
+![Example 3 image](https://raw.githubusercontent.com/MyGamesDevelopmentAcc/MyLibrary_GUI/main/.previews/3.png)
+
+### 04 Selection and Callbacks
+
+What it shows:
+- Multi-selection interactions.
+- Callback events (`SelectionChanged`, mouse click callbacks).
+- Programmatic selection and row navigation helpers.
+
+Screenshot placeholder:
+![Example 4 image](https://raw.githubusercontent.com/MyGamesDevelopmentAcc/MyLibrary_GUI/main/.previews/4.png)
+
+### 05 Texture Health Status
+
+What it shows:
+- MyArenaLog-style texture layering in a `WowList` row.
+- Health/damage/heal/absorb bar overlays in a dedicated bar region.
+- Non-overlapping percentage text and in-frame color legend.
+
+Screenshot placeholder:
+![Example 5 image](https://raw.githubusercontent.com/MyGamesDevelopmentAcc/MyLibrary_GUI/main/.previews/5.png)
+
+### 06 Advanced Coloring
+
+What it shows:
+- Strong conditional row and cell coloring by severity/value.
+- Combined sorting, filtering, and hover tooltip behavior.
+- Overlay highlighting patterns for high-signal rows.
+
+Screenshot placeholder:
+![Example 6 image](https://raw.githubusercontent.com/MyGamesDevelopmentAcc/MyLibrary_GUI/main/.previews/6.png)
+
+### 07 Performance (25,000 Rows)
+
+What it shows:
+- Large dataset handling (`25,000` rows) with deterministic data generation.
+- Manual regenerate and refresh actions.
+- Filtering and sorting on high-volume data plus basic timing/row-count stats.
+
+Screenshot placeholder:
+![Example 7 image](https://raw.githubusercontent.com/MyGamesDevelopmentAcc/MyLibrary_GUI/main/.previews/7.png)
