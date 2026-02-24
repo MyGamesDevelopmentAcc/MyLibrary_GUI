@@ -1,6 +1,4 @@
---[[
-    This file used to contain libraries which allowed for easy creation of frames and then to resking them easily. I have since remove skins and no longer use them. This file would need to be cleaned up, but nobody got time for this ;)
-]]
+-- Utility helpers for creating and styling common WoW UI frames.
 
 local MAJOR, MINOR = "MyLibrary_GUI", 1
 local MyLibrary_GUI, oldminor = LibStub:NewLibrary(MAJOR, MINOR);
@@ -36,7 +34,7 @@ local function printTable(t, s)
     if s == nil then s = ""; end
     for i, v in pairs(t) do
         print(s .. i .. "=", v);
-        if type(v) == "table" then printTable(v, s .. "   ") end
+        if type(v) == "table" then printTable(v, s .. " ") end
     end
 end
 
@@ -48,7 +46,7 @@ function GL:SetLayout(name)
     if GL.layouts[name] ~= nil then
         GL.layoutName = name;
     else
-        self:Print("There is no such layout."); --todo maybe print available layouts
+        self:Print("There is no such layout.");
     end
 end
 
@@ -107,11 +105,10 @@ function GL:SetButtonLook(f)
     end
 end
 
--- set Frame look
 function GL:SetFrameLook(f, backgroundPicture)
     local l = GL:GetLayout();
 
-    if (f:IsObjectType("Button") or backgroundPicture == nil) then --goNormal is used mainly for buttons - cuz they are also frames, but we dont want them to be skinned as other frames :)
+    if (f:IsObjectType("Button") or backgroundPicture == nil) then
         f:SetBackdrop({
             bgFile = GL.blank,
             edgeFile = GL.blank,
@@ -126,19 +123,18 @@ function GL:SetFrameLook(f, backgroundPicture)
         local bgpic = backgroundPicture;
 
         f:SetBackdrop({
-            bgFile = bgpic,                                      -- DkpBidder["media"].blank,  -- path to the background texture
+            bgFile = bgpic,                          -- path to the background texture
             edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", -- path to the border texture
 
-            tile = false,                                        -- true to repeat the background texture to fill the frame, false to scale it
-            tileSize = 32,                                       -- size (width or height) of the square repeating background tiles (in pixels)
-            edgeSize = 12,                                       -- thickness of edge segments and square size of edge corners (in pixels)
+            tile = false,                            -- true to repeat the background texture to fill the frame, false to scale it
+            tileSize = 32,                           -- size (width or height) of the square repeating background tiles (in pixels)
+            edgeSize = 12,                           -- thickness of edge segments and square size of edge corners (in pixels)
             insets = { left = 3, right = 3, top = 3, bottom = 3 }
         })
         if backgroundPicture == nil then f:SetBackdropColor(unpack(l.backdropcolor)) end
     end
 end
 
--- create Texture function
 function GL.CreateTexture(frame, name, level, width, height, point, relativeTo, point2, x, y, texturePath)
     local texture = frame:CreateTexture(name, level);
 
@@ -149,7 +145,7 @@ function GL.CreateTexture(frame, name, level, width, height, point, relativeTo, 
     if (point) then
         texture:SetPoint(point, relativeTo, point2, x, y);
         if texturePath then
-            texture:SetTexture(texturePath); --[[Interface\TaxiFrame\UI-TaxiFrame-TopRight]]
+            texture:SetTexture(texturePath);
         end
     end
 
@@ -174,8 +170,6 @@ function GL:CreateCheckBox(text)
     return frame;
 end
 
----CreateFrame(self.ver.."_RosterFrame","DKP Roster","BASIC",400,415,'LEFT',UIParent,'LEFT',100 ,0);--400 375
-
 function GL:CreateSimpleFrame(frameName, width, height)
     width = width or 665;
     height = height or 395;
@@ -186,7 +180,6 @@ function GL:CreateSimpleFrame(frameName, width, height)
 
     f:SetWidth(width);
     f:SetHeight(height);
-    --f:EnableMouse(true); ?? co to robi?
     f:SetMovable(true);
     f:SetPoint('CENTER', UIParent, 'CENTER', -100, 0)
     f:SetScript("OnMouseDown",
@@ -200,19 +193,16 @@ function GL:CreateSimpleFrame(frameName, width, height)
     f:SetScript("OnShow",
         function(self)
             PlaySound(SOUNDKIT.IG_CHARACTER_INFO_OPEN);
-            ---
         end)
     f:SetScript("OnHide",
         function(self)
             PlaySound(SOUNDKIT.IG_CHARACTER_INFO_CLOSE);
-            ---
         end)
 
 
     f:SetFrameStrata("MEDIUM");
     f:SetToplevel(true);
 
-    --close button
     local cb = CreateFrame("Button", frameName .. "closeButton", f, "UIPanelCloseButton");
     cb:SetPoint("TOPRIGHT", f, "TOPRIGHT", 0, 0);
     cb:SetWidth(32);
@@ -232,7 +222,6 @@ function GL:RegisterTab(frame, name, top, inset)
         top and "PanelTopTabButtonTemplate" or "PanelTabButtonTemplate"); --PanelTopTabButtonTemplate
 
     local id = #frame.Tabs;
-    --table.insert(self.Tabs, newTab);
     newTab:SetText(name);
     if (#frame.Tabs == 1) then
         if (top) then
@@ -241,7 +230,6 @@ function GL:RegisterTab(frame, name, top, inset)
             newTab:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 11, 2);
         end
     end
-    --
     newTab:SetID(id);
     newTab:SetScript("OnClick", function()
         PanelTemplates_SetTab(frame, id)
@@ -296,7 +284,6 @@ function GL:CreateButtonFrame(frameName, width, height, doNotAnchor, parentFrame
 
     f:SetWidth(width);
     f:SetHeight(height);
-    --f:EnableMouse(true); ?? co to robi?
     f:SetMovable(true);
     if (not doNotAnchor) then
         f:SetPoint('CENTER', parentFrame, 'CENTER', -100, 0)
@@ -312,12 +299,10 @@ function GL:CreateButtonFrame(frameName, width, height, doNotAnchor, parentFrame
     f:SetScript("OnShow",
         function(self)
             PlaySound(SOUNDKIT.IG_CHARACTER_INFO_OPEN);
-            ---
         end)
     f:SetScript("OnHide",
         function(self)
             PlaySound(SOUNDKIT.IG_CHARACTER_INFO_CLOSE);
-            ---
         end)
 
 
@@ -328,7 +313,7 @@ function GL:CreateButtonFrame(frameName, width, height, doNotAnchor, parentFrame
     return f;
 end
 
-function GL:CreateFrame(name, title, frameType, width, height, point, relativeTo, point2, x, y) -- naming should be adjusted
+function GL:CreateFrame(name, title, frameType, width, height, point, relativeTo, point2, x, y)
     local f = CreateFrame("Frame", name, UIParent, "BackdropTemplate");
     table.insert(_G.UISpecialFrames, name);
     f:SetWidth(width);
@@ -358,26 +343,21 @@ function GL:CreateFrame(name, title, frameType, width, height, point, relativeTo
             insets = { left = 11, right = 11, top = 12, bottom = 10 }
         })
     end
-    --close button
     f.view = {};
     f.view["closeButton"] = CreateFrame("Button", name .. "closeButton", f, "UIPanelCloseButton");
     local cb = f.view["closeButton"];
     cb:SetPoint("TOPRIGHT", f, "TOPRIGHT", -4, -4);
     cb:SetWidth(32);
     cb:SetHeight(32);
-    --//
-
-    --titleframe and text
     local v = f.view;
     v.titleFrame = CreateFrame("Frame", name .. "_titleFrame", f)
     v.titleString = self.CreateFontString(v.titleFrame, name .. "_title", "ARTWORK", title, "TOP", v.titleFrame, "TOP",
         18, -14);
     v.titleString:SetFont([[Fonts\MORPHEUS.ttf]], 14);
-    v.titleString:SetTextColor(1, 1, 1, 1); --shadow??
+    v.titleString:SetTextColor(1, 1, 1, 1);
 
     v.titleFrame:SetHeight(40)
-    v.titleFrame:SetWidth(width / 3); --v.titleString:GetWidth() + 40);
-    ----print("TUTAJ "..v.Title:GetWidth())
+    v.titleFrame:SetWidth(width / 3);
 
     v.titleString:SetPoint("TOP", f, "TOP", 0, 2);
     v.titleFrame:SetPoint("TOP", v.titleString, "TOP", 0, 12);
