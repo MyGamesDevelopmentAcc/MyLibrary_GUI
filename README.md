@@ -20,6 +20,8 @@ Open the examples menu from the Addon Compartment menu (top-right addon button a
 
 ### 01 Basic
 
+Source file: [`examples/example_01_basic.lua`](examples/example_01_basic.lua)
+
 What it shows:
 - Small, minimal list setup.
 - Basic row insertion and view refresh.
@@ -29,6 +31,8 @@ Screenshot placeholder:
 ![Example 1 image](https://raw.githubusercontent.com/MyGamesDevelopmentAcc/MyLibrary_GUI/main/.previews/1.png)
 
 ### 02 Sorting
+
+Source file: [`examples/example_02_sorting.lua`](examples/example_02_sorting.lua)
 
 What it shows:
 - Header-click sorting with per-column comparators.
@@ -40,6 +44,8 @@ Screenshot placeholder:
 
 ### 03 Filtering (TradeChat Style)
 
+Source file: [`examples/example_03_filtering_tradechat.lua`](examples/example_03_filtering_tradechat.lua)
+
 What it shows:
 - Text search filtering across multiple fields.
 - Named filter pattern (`AddFilter`) driven by UI input.
@@ -49,6 +55,8 @@ Screenshot placeholder:
 ![Example 3 image](https://raw.githubusercontent.com/MyGamesDevelopmentAcc/MyLibrary_GUI/main/.previews/3.png)
 
 ### 04 Selection and Callbacks
+
+Source file: [`examples/example_04_selection_callbacks.lua`](examples/example_04_selection_callbacks.lua)
 
 What it shows:
 - Multi-selection interactions.
@@ -60,6 +68,8 @@ Screenshot placeholder:
 
 ### 05 Texture Health Status
 
+Source file: [`examples/example_05_texture_health_status.lua`](examples/example_05_texture_health_status.lua)
+
 What it shows:
 - MyArenaLog-style texture layering in a `WowList` row.
 - Health/damage/heal/absorb bar overlays in a dedicated bar region.
@@ -70,6 +80,8 @@ Screenshot placeholder:
 
 ### 06 Advanced Coloring
 
+Source file: [`examples/example_06_advanced_coloring.lua`](examples/example_06_advanced_coloring.lua)
+
 What it shows:
 - Strong conditional row and cell coloring by severity/value.
 - Combined sorting, filtering, and hover tooltip behavior.
@@ -79,6 +91,8 @@ Screenshot placeholder:
 ![Example 6 image](https://raw.githubusercontent.com/MyGamesDevelopmentAcc/MyLibrary_GUI/main/.previews/6.png)
 
 ### 07 Performance (25,000 Rows)
+
+Source file: [`examples/example_07_perf_25000.lua`](examples/example_07_perf_25000.lua)
 
 What it shows:
 - Large dataset handling (`25,000` rows) with deterministic data generation.
