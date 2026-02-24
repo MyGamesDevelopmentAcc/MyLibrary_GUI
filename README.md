@@ -73,7 +73,7 @@ Source file: [`examples/example_05_texture_health_status.lua`](examples/example_
 What it shows:
 - MyArenaLog-style texture layering in a `WowList` row.
 - Health/damage/heal/absorb bar overlays in a dedicated bar region.
-- Non-overlapping percentage text and in-frame color legend.
+- Non-overlapping percentage text and in-frame color legend. (overlapping is of course possible as well)
 
 Screenshot placeholder:
 ![Example 5 image](https://raw.githubusercontent.com/MyGamesDevelopmentAcc/MyLibrary_GUI/main/.previews/5.png)
