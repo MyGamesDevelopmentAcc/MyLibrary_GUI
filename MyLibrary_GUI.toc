@@ -2,4 +2,16 @@
 ## Title: Lib: |CFFFF2459My|rLibrary GUI
 ## Dependencies: 
 ## Version: 11.0.2-1.2
+## AddonCompartmentFunc: MyLibrary_GUI_Examples_OnClick
+
 gui.xml
+examples/init.lua
+examples/shared_data.lua
+examples/main.lua
+examples/example_01_basic.lua
+examples/example_02_sorting.lua
+examples/example_03_filtering_tradechat.lua
+examples/example_04_selection_callbacks.lua
+examples/example_05_texture_health_status.lua
+examples/example_06_advanced_coloring.lua
+examples/example_07_perf_25000.lua
